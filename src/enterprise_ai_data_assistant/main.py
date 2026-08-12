@@ -1,6 +1,7 @@
 from fastapi import FastAPI
+from enterprise_ai_data_assistant.config import settings
 
-app = FastAPI()
+app = FastAPI(title= settings.app_name)
 
 @app.get("/")
 def root():
