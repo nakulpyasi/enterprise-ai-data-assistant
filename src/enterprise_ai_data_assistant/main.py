@@ -7,6 +7,7 @@ app = FastAPI(title=settings.app_name)
 app.include_router(health_router)
 app.include_router(ask_router)
 
+
 @app.get("/")
 def root():
     return {"message": "Enterprise AI Data Assistant is running"}
