@@ -12,5 +12,14 @@ class Settings(BaseSettings):
     azure_openai_model: str
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
+    database_url: str
+
+    foundry_project_endpoint: str
+    foundry_rag_agent_name: str
+    foundry_rag_agent_version: str
+
+    foundry_sql_agent_name: str
+    foundry_sql_agent_version: str
+
 
 settings = Settings()

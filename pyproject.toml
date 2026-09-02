@@ -8,14 +8,19 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "agent-framework-core>=1.13.0,<2.0.0",
+    "agent-framework-foundry==1.11.0",
+    "azure-ai-projects>=2.3.0",
     "azure-identity>=1.25.3",
     "azure-search-documents>=12.0.0",
-    "fastapi>=0.141.1",
-    "openai>=3.1.0",
+    "fastapi[standard]>=0.141.1",
+    "openai>=2.25.0,<3.0.0",
+    "psycopg[binary]>=3.3.4",
     "pydantic-settings>=2.15.0",
     "pypdf>=6.16.0",
     "python-dotenv>=1.2.2",
     "python-multipart>=0.0.32",
+    "sqlalchemy>=2.0.52",
     "uvicorn>=0.52.1",
 ]
 

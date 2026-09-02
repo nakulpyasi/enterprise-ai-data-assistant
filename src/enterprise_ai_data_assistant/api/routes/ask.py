@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 from enterprise_ai_data_assistant.schemas import AskRequest
-from enterprise_ai_data_assistant.services.ask_service import generate_answer
+from enterprise_ai_data_assistant.services.orchestration_service import orchestrate
 
 router = APIRouter()
 
 
 @router.post("/ask")
-def ask(request: AskRequest):
-    return generate_answer(request.question)
+async def ask(request: AskRequest):
+    answer = await orchestrate(request.question)
+    return {"answer": answer}
