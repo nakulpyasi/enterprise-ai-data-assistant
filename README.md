@@ -629,27 +629,6 @@ This project demonstrates practical experience with:
 
 ---
 
-## Future Improvements
-
-Planned improvements include:
-
-- automated agent evaluation
-- RAG quality evaluation
-- SQL correctness evaluation
-- distributed tracing
-- latency and token monitoring
-- structured logging
-- CI/CD with GitHub Actions
-- automated testing
-- user authentication
-- rate limiting
-- improved error handling
-- conversation history
-- request-scoped agent tracking
-- richer enterprise datasets
-
----
-
 ## Author
 
 **Nakul Pyasi**
