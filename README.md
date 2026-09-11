@@ -32,6 +32,9 @@ How many support tickets are currently open?
 
 How many support tickets are open, and what does the warranty policy say for Product A?
 
+## Demo
+
+![Enterprise AI Data Assistant UI](docs/images/demo.png)
 
 ## Architecture
 
