@@ -26,11 +26,17 @@ sql_agent_service = FoundryAgentService(
     agent_version=settings.foundry_sql_agent_version,
 )
 
+agents_used = []
+
 
 @tool
 async def ask_rag_agent(question: str) -> str:
     """Use the registered RAG Agent for document, warranty, and policy questions."""
     print("TOOL CALLED: ask_rag_agent")
+
+    if "rag_agent" not in agents_used:
+        agents_used.append("rag_agent")
+
     return await asyncio.to_thread(rag_agent_service.ask_rag_agent, question)
 
 
@@ -38,6 +44,9 @@ async def ask_rag_agent(question: str) -> str:
 async def ask_sql_agent(question: str) -> str:
     """Use the registered SQL Agent for counts, statuses, and database questions."""
     print("TOOL CALLED: ask_sql_agent")
+
+    if "sql_agent" not in agents_used:
+        agents_used.append("sql_agent")
     return await asyncio.to_thread(sql_agent_service.ask_sql_agent, question)
 
 
@@ -55,9 +64,12 @@ manager = Agent(
 )
 
 
-async def orchestrate(question: str) -> str:
+async def orchestrate(question: str) -> dict:
+    agents_used.clear()
+
     result = await manager.run(question)
-    return result.text
+
+    return {"answer": result.text, "agents_used": agents_used.copy()}
 
 
 async def main():
