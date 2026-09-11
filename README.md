@@ -23,6 +23,10 @@ A manager agent determines whether a question should be handled by:
 - a SQL agent for structured database questions
 - both agents for hybrid questions
 
+## Demo
+
+![Enterprise AI Data Assistant UI](docs/images/demo.png)
+
 Example questions:
 
 ```text
@@ -32,9 +36,7 @@ How many support tickets are currently open?
 
 How many support tickets are open, and what does the warranty policy say for Product A?
 
-## Demo
 
-![Enterprise AI Data Assistant UI](docs/images/demo.png)
 
 ## Architecture
 
