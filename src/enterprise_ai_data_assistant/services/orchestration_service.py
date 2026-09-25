@@ -2,6 +2,7 @@ from agent_framework import Agent, tool
 from agent_framework.foundry import FoundryChatClient
 from azure.identity import DefaultAzureCredential
 import asyncio
+from contextvars import ContextVar
 
 from enterprise_ai_data_assistant.config import settings
 from enterprise_ai_data_assistant.services.foundry_agent_service import (
@@ -26,7 +27,14 @@ sql_agent_service = FoundryAgentService(
     agent_version=settings.foundry_sql_agent_version,
 )
 
-agents_used = []
+agents_used_context: ContextVar[list[str] | None] = ContextVar(
+    "agents_used", default=None
+)
+
+tool_errors_context: ContextVar[list[Exception] | None] = ContextVar(
+    "tool_errors",
+    default=None,
+)
 
 
 @tool
@@ -34,10 +42,21 @@ async def ask_rag_agent(question: str) -> str:
     """Use the registered RAG Agent for document, warranty, and policy questions."""
     print("TOOL CALLED: ask_rag_agent")
 
-    if "rag_agent" not in agents_used:
-        agents_used.append("rag_agent")
+    agents_used = agents_used_context.get()
 
-    return await asyncio.to_thread(rag_agent_service.ask_rag_agent, question)
+    if agents_used is not None and "rag_agent" not in agents_used:
+        agents_used.append("rag_agent")
+    try:
+        return await asyncio.to_thread(
+            rag_agent_service.ask_rag_agent,
+            question,
+        )
+    except Exception as error:
+        tool_errors = tool_errors_context.get()
+
+        if tool_errors is not None:
+            tool_errors.append(error)
+        raise
 
 
 @tool
@@ -45,9 +64,21 @@ async def ask_sql_agent(question: str) -> str:
     """Use the registered SQL Agent for counts, statuses, and database questions."""
     print("TOOL CALLED: ask_sql_agent")
 
-    if "sql_agent" not in agents_used:
+    agents_used = agents_used_context.get()
+
+    if agents_used is not None and "sql_agent" not in agents_used:
         agents_used.append("sql_agent")
-    return await asyncio.to_thread(sql_agent_service.ask_sql_agent, question)
+    try:
+        return await asyncio.to_thread(
+            sql_agent_service.ask_sql_agent,
+            question,
+        )
+    except Exception as error:
+        tool_errors = tool_errors_context.get()
+
+        if tool_errors is not None:
+            tool_errors.append(error)
+        raise
 
 
 manager = Agent(
@@ -65,11 +96,22 @@ manager = Agent(
 
 
 async def orchestrate(question: str) -> dict:
-    agents_used.clear()
+    agents_token = agents_used_context.set([])
+    errors_token = tool_errors_context.set([])
 
-    result = await manager.run(question)
+    try:
+        result = await manager.run(question)
 
-    return {"answer": result.text, "agents_used": agents_used.copy()}
+        agents_used = agents_used_context.get()
+        tool_errors = tool_errors_context.get()
+
+        if tool_errors:
+            raise tool_errors[0]
+
+        return {"answer": result.text, "agents_used": agents_used.copy()}
+    finally:
+        agents_used_context.reset(agents_token)
+        tool_errors_context.reset(errors_token)
 
 
 async def main():
